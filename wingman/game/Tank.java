@@ -140,9 +140,11 @@ public class Tank extends PlayerShip {
     @Override
     public void fire()
     {
-        // TODO: parent class ignores rotation.
         this.weapon.setAngle(this.angle);
-        super.fire();
+        if(respawnCounter<=0){
+            this.weapon.fireWeapon(this);
+            GameWorld.getInstance().sound.play("Resources/snd_explosion1.wav");
+        }
     }
     
     @Override
