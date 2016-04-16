@@ -82,7 +82,7 @@ public class GameMenu extends InterfaceObject {
         else if(selection == 1){
             int[] controls = {KeyEvent.VK_A,KeyEvent.VK_W, KeyEvent.VK_D, KeyEvent.VK_S, KeyEvent.VK_SPACE};
             PlayerShip[] players = new PlayerShip[2];
-            players[0] = new Tank(new Point(160, size.height-50), new Point(6,6),GameWorld.sprites.get("player1"), controls, "Player 1");
+            players[0] = new Tank(new Point(140, 50), new Point(6,6),GameWorld.sprites.get("player1"), controls, "Player 1");
             controls = new int[] {KeyEvent.VK_LEFT,KeyEvent.VK_UP, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN, KeyEvent.VK_ENTER};
             players[1] = new Tank(new Point(400, size.height-50), new Point(6,6),GameWorld.sprites.get("player2"), controls, "Player 2");
             world.addPlayer(players);
