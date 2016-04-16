@@ -44,7 +44,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
     Point speed = new Point(0,0);
     Random generator = new Random();
     int sizeX, sizeY;
-    private int shake;
     private int[] leftWindowCoords;
     private int[] rightWindowCoords;
     
@@ -60,6 +59,12 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
     private ArrayList<Integer> shakeLeft;
     private ArrayList<Integer> shakeRight;
     private Iterator<Integer> shakeLeftIter;
+    /*
+     * Stores the shake array of a player.  This is updated during a collision
+     * and used to shake the screen of player x (shake[x] is the shake array of
+     * player number x).
+     */
+    private HashMap<String, Iterator<Integer>> shake;
     
     public static HashMap<String, Image> sprites;
     public static HashMap<String, MotionController> motions = new HashMap<String, MotionController>();
@@ -89,7 +94,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         leftWindowCoords[0] = 0;
         leftWindowCoords[1] = 0;
         rightWindowCoords = new int[2];
-        this.shake = 0;
+        shake = new HashMap<String, Iterator<Integer>>();
         
         sprites = new HashMap<String,Image>();
     }
@@ -126,7 +131,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         addBackground(new Background(sizeX,sizeY,speed, sprites.get("floor")));
         try (BufferedReader reader = Files.newBufferedReader(file, charset)) {
             while ((line = reader.readLine()) != null) {
-                //System.out.println(line);
                 while (charIdx < line.length()) {
                     point = new Point(xCoord, yCoord);
                     char curTile = line.charAt(charIdx);
@@ -274,11 +278,19 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             players.add(player);
             playersInPlay.add(player);
             ui.add(new HealthBar(player, Integer.toString(players.size())));
+            shake.put(player.getName(), null);
         }
         ui.add(new ScoreBar(players.get(0),
                new Point((this.sizeX / 2) - 20, 20)));
         ui.add(new ScoreBar(players.get(1),
                new Point((this.sizeX / 2) + 20, 20)));
+    }
+
+    /**
+     * Update a player's shake array.
+     */
+    public void setShake(String playerName, Iterator<Integer> iter) {
+        this.shake.put(playerName, iter);
     }
     
     // add background items (islands)
@@ -355,8 +367,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             if (player1.collision(player2)) {
                 player1.collide(player2);
                 player2.collide(player1);
-                player1.damage(10);
-                player2.damage(10);
             }
             
             // remove stray enemy bullets and draw
@@ -368,18 +378,11 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                     PlayerShip player = players.next();
                     if(bullet.collision(player) && player.respawnCounter<=0 &&
                        bullet.getOwner() != player){
-                        player.damage(bullet.getStrength());
                         iterator.remove();
+                        player.collide(bullet);
                         if(player.isDead()){
                             bullet.getOwner().incrementScore(1);
                         }
-                    this.shake = -1;
-                    this.shakeLeft.clear();
-                    this.shakeLeft.add(Integer.valueOf(-1));
-                    this.shakeLeft.add(Integer.valueOf(1));
-                    this.shakeLeft.add(Integer.valueOf(-1));
-                    this.shakeLeft.add(Integer.valueOf(1));
-                    this.shakeLeftIter = this.shakeLeft.iterator();
                     }
                 }
                 for (BackgroundObject bg : this.collidableBackgrounds) {
@@ -483,28 +486,22 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         return g2;
     }
 
-    private void leftWindow() {
+    private void leftWindow(int playerNum) {
+        int[] windowCoords;
+        if (playerNum == 0) {
+            windowCoords = this.leftWindowCoords;
+        }
+        else {
+            windowCoords = this.rightWindowCoords;
+        }
         int H = getSize().height;
         int W = getSize().width / 2;
         int R = this.sizeX;
         int B = this.sizeY;
-        int x = this.players.get(0).getX();
-        int y = this.players.get(0).getY();
-        if (this.shakeLeftIter.hasNext()) {
-            int shake = this.shakeLeftIter.next();
-            x = x + shake;
-            y = y + shake;
-        }
-        //if (this.shake < 0) {
-            //x = x - 10;
-            //y = y - 10;
-            //this.shake = 1;
-        //}
-        //else if (this.shake > 0) {
-            //x = x + 10;
-            //y = y + 10;
-            //this.shake = 0;
-        //}
+        int x = this.players.get(playerNum).getX();
+        int y = this.players.get(playerNum).getY();
+        Iterator<Integer> shakeIter = this.shake.get(
+                                  this.players.get(playerNum).getName());
         if (x <= (W / 2)) {
             x = 0;
         }
@@ -523,8 +520,13 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         else {
             y = y - (H / 2);
         }
-        this.leftWindowCoords[0] = x;
-        this.leftWindowCoords[1] = y;
+        if ((shakeIter != null) && shakeIter.hasNext()) {
+            int shake = shakeIter.next();
+            x = x + shake;
+            y = y + shake;
+        }
+        windowCoords[0] = x;
+        windowCoords[1] = y;
     }
 
     private void rightWindow() {
@@ -568,8 +570,8 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             g.drawImage(bimg, 0, 0, this);
             return;
         }
-        this.leftWindow();
-        this.rightWindow();
+        this.leftWindow(0);
+        this.leftWindow(1);
         g.drawImage(bimg.getSubimage(this.leftWindowCoords[0], 
                                      this.leftWindowCoords[1],
                                      windowSize.width / 2, windowSize.height),
