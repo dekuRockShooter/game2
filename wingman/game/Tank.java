@@ -138,6 +138,12 @@ public class Tank extends PlayerShip {
     }
 
     @Override
+    public void collide(Ship otherObject){
+        this.collisionObj = otherObject;
+        super.damage(1);
+    }
+
+    @Override
     public void fire()
     {
         this.weapon.setAngle(this.angle);
