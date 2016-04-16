@@ -486,7 +486,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         return g2;
     }
 
-    private void leftWindow(int playerNum) {
+    private void paintWindow(int playerNum) {
         int[] windowCoords;
         if (playerNum == 0) {
             windowCoords = this.leftWindowCoords;
@@ -529,35 +529,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         windowCoords[1] = y;
     }
 
-    private void rightWindow() {
-        int H = getSize().height;
-        int W = getSize().width / 2;
-        int R = this.sizeX;
-        int B = this.sizeY;
-        int x = this.players.get(1).getX();
-        int y = this.players.get(1).getY();
-        if (x <= (W / 2)) {
-            x = 0;
-        }
-        else if (x >= (R - (W / 2))) {
-            x = R - W;
-        }
-        else {
-            x = x - (W / 2);
-        }
-        if (y >= (B - (H / 2))) {
-            y = B - H;
-        }
-        else if (y <= (H / 2)) {
-            y = 0;
-        }
-        else {
-            y = y - (H / 2);
-        }
-        this.rightWindowCoords[0] = x;
-        this.rightWindowCoords[1] = y;
-    }
-
     /* paint each frame */
     public void paint(Graphics g) {
         if(players.size()!=0)
@@ -570,8 +541,8 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             g.drawImage(bimg, 0, 0, this);
             return;
         }
-        this.leftWindow(0);
-        this.leftWindow(1);
+        this.paintWindow(0);
+        this.paintWindow(1);
         g.drawImage(bimg.getSubimage(this.leftWindowCoords[0], 
                                      this.leftWindowCoords[1],
                                      windowSize.width / 2, windowSize.height),
