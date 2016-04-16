@@ -172,8 +172,9 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         sprites.put("wall2", getSprite("Chapter11/Blue_wall2.png"));
         sprites.put("floor", getSprite("Chapter11/Background.png"));
         
-        sprites.put("bullet", getSprite("Resources/bullet.png"));
+        sprites.put("bullet", getSprite("Resources/enemybullet1.png"));
         sprites.put("enemybullet1", getSprite("Resources/enemybullet1.png"));
+        sprites.put("canon", getSprite("Resources/bullet.png"));
         
         sprites.put("player1", getSprite("Resources/myplane1.png"));
         sprites.put("player2", getSprite("Resources/myplane2.png"));
@@ -307,11 +308,13 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
     
     public void addRandomPowerUp(){
         // rapid fire weapon or pulse weapon
-        if(generator.nextInt(10)%2==0)
+        if(generator.nextInt(10)%2==0) {
             powerups.add(new PowerUp(generator.nextInt(sizeX), 1,
-                         new SpreadBomb()));
+                         new RotatableMachineGun()));
+        }
         else {
-            powerups.add(new PowerUp(generator.nextInt(sizeX), 1, new PulseWeapon()));
+            powerups.add(new PowerUp(generator.nextInt(sizeX), 1,
+                                     new RotatableCanon()));
         }
     }
     
@@ -436,7 +439,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 while(players.hasNext()){
                     PlayerShip player = players.next();
                     if(powerup.collision(player)){
-                        AbstractWeapon weapon = powerup.getWeapon();
+                        AbstractRotatableWeapon weapon = (AbstractRotatableWeapon)powerup.getWeapon();
                         player.setWeapon(weapon);
                         powerup.die();
                         iterator.remove();
