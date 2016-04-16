@@ -34,7 +34,8 @@ public class RotatableWeapon extends AbstractRotatableWeapon {
         Point speed = new Point((int)(25*Math.cos(angle)),
                                 (int)(-25*Math.sin(angle)));
         
-        Bullet bullet = new Bullet(location, speed, strength, new SimpleMotion(), theShip);
+        Bullet bullet = new Bullet(location, speed, strength,
+                                   new SimpleMotion(), theShip);
         bullets = new Bullet[1];
         bullets[0] = bullet;
                 
