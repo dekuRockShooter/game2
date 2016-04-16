@@ -9,12 +9,16 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.image.ImageObserver;
 import java.util.Observer;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import wingman.GameWorld;
 import wingman.modifiers.AbstractGameModifier;
 import wingman.modifiers.motions.InputController;
 import wingman.modifiers.weapons.RotatableWeapon;
 import wingman.modifiers.weapons.AbstractRotatableWeapon;
+import wingman.modifiers.weapons.AbstractWeapon;
 
 /**
  * Represent the player's tank.
@@ -24,6 +28,7 @@ public class Tank extends PlayerShip {
     private GameObject collisionObj;
     private boolean wasDead;
     private AbstractRotatableWeapon weapon;
+    private List<Integer> shakeList;
 
     public Tank(Point location, Point speed, Image img, int[] controls, String name) {
         super(location, speed, img, controls, name);
@@ -31,6 +36,7 @@ public class Tank extends PlayerShip {
         this.angle = 0;
         this.collisionObj= null;
         this.wasDead = false;
+        this.shakeList = new ArrayList<Integer>();
     }
 
     @Override
@@ -64,7 +70,13 @@ public class Tank extends PlayerShip {
         else
             respawnCounter -= 1;
     }
-    
+
+    @Override
+    public void setWeapon(AbstractWeapon weapon) {
+        this.weapon = (AbstractRotatableWeapon)weapon;
+        System.out.println("pwu");
+    }
+
     @Override
     public void update(int w, int h) {
         int direction = 0;
@@ -141,6 +153,19 @@ public class Tank extends PlayerShip {
     public void collide(Ship otherObject){
         this.collisionObj = otherObject;
         super.damage(1);
+    }
+
+    @Override
+    public void collide(Bullet otherObject){
+        int bulletStrength = otherObject.getStrength();
+        super.damage(bulletStrength);
+        this.shakeList.clear();
+        while (bulletStrength > 1) {
+            this.shakeList.add(bulletStrength);
+            this.shakeList.add(-bulletStrength);
+            bulletStrength = bulletStrength / 2;
+        }
+        GameWorld.getInstance().setShake(name, this.shakeList.iterator());
     }
 
     @Override
