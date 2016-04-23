@@ -22,7 +22,6 @@ import javax.swing.*;
 
 import wingman.game.*;
 import wingman.modifiers.*;
-import wingman.modifiers.motions.MotionController;
 import wingman.modifiers.weapons.*;
 import wingman.ui.*;
 
@@ -67,7 +66,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
     private HashMap<String, Iterator<Integer>> shake;
     
     public static HashMap<String, Image> sprites;
-    public static HashMap<String, MotionController> motions = new HashMap<String, MotionController>();
 
     // is player still playing, did they win, and should we exit
     boolean gameOver, gameWon, gameFinished;
