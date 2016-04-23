@@ -150,7 +150,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                         imgHeight = img.getHeight(this);
                         imgWidth = img.getWidth(this);
                         BreakableWall island = 
-                            new BreakableWall(point, 60, img);
+                            new BreakableWall(point, 10, img);
                         this.breakableWalls.add(island);
                         //collidableBackgrounds.add(island);
                     }
@@ -174,10 +174,19 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         
         sprites.put("bullet", getSprite("Resources/enemybullet1.png"));
         sprites.put("enemybullet1", getSprite("Resources/enemybullet1.png"));
-        sprites.put("canon", getSprite("Resources/bullet.png"));
+        sprites.put("canon", getSprite("Chapter11/canonBullet.png"));
         
-        sprites.put("player1", getSprite("Resources/myplane1.png"));
-        sprites.put("player2", getSprite("Resources/myplane2.png"));
+        sprites.put("player1", getSprite("Chapter11/Tank1.png"));
+        sprites.put("player2", getSprite("Chapter11/Tank2.png"));
+        sprites.put("player3", getSprite("Resources/player3.png"));
+        sprites.put("enemy1", getSprite("Resources/enemy1.png"));
+        sprites.put("enemy2", getSprite("Resources/enemy2.png"));
+        sprites.put("enemy3", getSprite("Resources/enemy3.png"));
+        sprites.put("bouncerPWUP", getSprite("Chapter11/BouncerPowerup.png"));
+        sprites.put("machinegunPWUP", getSprite("Chapter11/MachineGunPowerup.png"));
+        sprites.put("canonPWUP", getSprite("Chapter11/CanonPowerup.png"));
+        sprites.put("minePWUP", getSprite("Chapter11/MinePowerup.png"));
+        sprites.put("planePWUP", getSprite("Resources/life2.png"));
         
         sprites.put("explosion1_1", getSprite("Resources/explosion1_1.png"));
         sprites.put("explosion1_2", getSprite("Resources/explosion1_2.png"));
@@ -281,9 +290,9 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             ui.add(new HealthBar(player, Integer.toString(players.size())));
             shake.put(player.getName(), null);
         }
-        ui.add(new ScoreBar(players.get(0),
-               new Point((this.sizeX / 2) - 20, 20)));
-        ui.add(new ScoreBar(players.get(1),
+        ui.add(new ScoreBar(playersInPlay.get(0),
+               new Point(0,0)));
+        ui.add(new ScoreBar(playersInPlay.get(1),
                new Point((this.sizeX / 2) + 20, 20)));
     }
 
@@ -308,22 +317,40 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
     
     public void addRandomPowerUp(){
         // rapid fire weapon or pulse weapon
-        if(generator.nextInt(10)%2==0) {
+        int randInt = generator.nextInt(20) % 5;
+        if(randInt == 0) {
             powerups.add(new PowerUp(generator.nextInt(sizeX), 1,
-                         new RotatableMachineGun()));
+                         new RotatableMachineGun(),
+                         sprites.get("machinegunPWUP")));
         }
-        else {
+        else if (randInt == 1) {
             powerups.add(new PowerUp(generator.nextInt(sizeX), 1,
-                                     new RotatableCanon()));
+                                     new RotatableCanon(),
+                                     sprites.get("canonPWUP")));
+        }
+        else if (randInt == 2) {
+            powerups.add(new PowerUp(generator.nextInt(sizeX), 1,
+                                     new RotatableBouncer(),
+                                     sprites.get("bouncerPWUP")));
+        }
+        else if (randInt == 3) {
+            powerups.add(new PowerUp(generator.nextInt(sizeX), 1,
+                                     new Mine(),
+                                     sprites.get("minePWUP")));
+        }
+        else if (randInt == 4) {
+            powerups.add(new PowerUp(generator.nextInt(sizeX), 1,
+                                     new RotatablePlaneCanon(),
+                                     sprites.get("planePWUP")));
         }
     }
     
     // add enemies to the game world
     public void addEnemies(Ship...newObjects){
-        //for(Ship enemy : newObjects){
-            //enemies.add(enemy);
-            //enemy.start();
-        //}
+        for(Ship enemy : newObjects){
+            enemies.add(enemy);
+            enemy.start();
+        }
     }
     
     public void addClockObserver(Observer theObject){
@@ -342,6 +369,25 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             menu.draw(g2, w, h);
         }
         else if (!gameFinished) {                        
+
+            // Draw some explosions.
+            if ((this.getTime() % 100) == 0) {
+                int x = generator.nextInt(100);
+                int y = generator.nextInt(100);
+                if ((x % 2) == 0) {
+                    x = -x;
+                }
+                if ((y % 2) == 0) {
+                    y = -y;
+                }
+                this.addBackground(new SmallExplosion(new Point(
+                                this.playersInPlay.get(0).getX() + x, 
+                                this.playersInPlay.get(0).getY() + y)));
+                this.addBackground(new SmallExplosion(new Point(
+                                this.playersInPlay.get(1).getX() - y, 
+                                this.playersInPlay.get(1).getY() - x)));
+            }
+
             while(iterator.hasNext()){
                 BackgroundObject obj = (BackgroundObject) iterator.next();
                 obj.update(w, h);
@@ -373,16 +419,18 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             }
             
             // remove stray enemy bullets and draw
-            iterator = getEnemyBullets();
-            while(iterator.hasNext()){
-                Bullet bullet = (Bullet) iterator.next();
+            Iterator<Bullet> bulletIter = getEnemyBullets();
+            while(bulletIter.hasNext()){
+                Bullet bullet = (Bullet) bulletIter.next();
                 ListIterator<PlayerShip> players = getPlayers();
                 while(players.hasNext()){
                     PlayerShip player = players.next();
                     if(bullet.collision(player) && player.respawnCounter<=0 &&
                        bullet.getOwner() != player){
-                        iterator.remove();
                         player.collide(bullet);
+                        bullet.collide(player);
+                        if (bullet.isDead())
+                            bulletIter.remove();
                         if(player.isDead()){
                             bullet.getOwner().incrementScore(1);
                         }
@@ -390,7 +438,9 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 }
                 for (BackgroundObject bg : this.collidableBackgrounds) {
                     if (bullet.collision(bg)) {
-                        iterator.remove();
+                        bullet.collide(bg);
+                        if (bullet.isDead())
+                            bulletIter.remove();
                     }
                 }
                 Iterator<BreakableWall> breakableIter;
@@ -399,7 +449,9 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 while (breakableIter.hasNext()) {
                     breakable = breakableIter.next();
                     if(bullet.collision(breakable)){
-                        iterator.remove();
+                        bullet.collide(breakable);
+                        if (bullet.isDead())
+                            bulletIter.remove();
                         breakable.damage(bullet.getStrength());
                         if (breakable.isDead()) {
                             breakableIter.remove();
@@ -407,7 +459,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                     }
                 }
                 if(bullet.getY()>h+10 || bullet.getY()<-10){
-                    iterator.remove();
+                    bulletIter.remove();
                 }
                 bullet.draw(g2, this);
             }
@@ -429,6 +481,9 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 PlayerShip player = (PlayerShip) iterator.next();
                 player.update(w, h);
                 player.draw(g2, this);
+            }
+            for (Ship enemy : this.enemies) {
+                enemy.draw(g2, this);
             }
             
             // powerups
@@ -469,7 +524,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             }
             g2.drawString("Score", sizeX/3, 400);
             int i = 1;
-            for(PlayerShip player : players){
+            for(PlayerShip player : this.playersInPlay){
                 g2.drawString(player.getName() + ": " + Integer.toString(player.getScore()), sizeX/3, 375+50*i);
                 i++;
             }
@@ -501,10 +556,10 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         int W = getSize().width / 2;
         int R = this.sizeX;
         int B = this.sizeY;
-        int x = this.players.get(playerNum).getX();
-        int y = this.players.get(playerNum).getY();
+        int x = this.playersInPlay.get(playerNum).getX();
+        int y = this.playersInPlay.get(playerNum).getY();
         Iterator<Integer> shakeIter = this.shake.get(
-                                  this.players.get(playerNum).getName());
+                                  this.playersInPlay.get(playerNum).getName());
         if (x <= (W / 2)) {
             x = 0;
         }
@@ -534,7 +589,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
 
     /* paint each frame */
     public void paint(Graphics g) {
-        if(players.size()!=0)
+        if(playersInPlay.size()!=0)
             clock.tick();
         Dimension windowSize = getSize();
         Graphics2D g2 = createGraphics2D(this.sizeX, this.sizeY);
