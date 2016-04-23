@@ -22,7 +22,7 @@ public class GameApplication {
         f.getContentPane().add("Center", game);
         f.pack();
         f.setSize(new Dimension(800, 600));
-        game.setDimensions(1000, 1000);
+        game.setDimensions(800, 840);
         game.init();
         f.setVisible(true);
         f.setResizable(false);
