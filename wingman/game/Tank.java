@@ -17,6 +17,7 @@ import wingman.GameWorld;
 import wingman.modifiers.AbstractGameModifier;
 import wingman.modifiers.motions.InputController;
 import wingman.modifiers.weapons.RotatableWeapon;
+import wingman.modifiers.weapons.RotatablePlaneCanon;
 import wingman.modifiers.weapons.AbstractRotatableWeapon;
 import wingman.modifiers.weapons.AbstractWeapon;
 
@@ -29,6 +30,8 @@ public class Tank extends PlayerShip {
     private boolean wasDead;
     private AbstractRotatableWeapon weapon;
     private List<Integer> shakeList;
+    private boolean isPlane;
+    private Image tankImg;
 
     public Tank(Point location, Point speed, Image img, int[] controls, String name) {
         super(location, speed, img, controls, name);
@@ -37,6 +40,8 @@ public class Tank extends PlayerShip {
         this.collisionObj= null;
         this.wasDead = false;
         this.shakeList = new ArrayList<Integer>();
+        this.isPlane = false;
+        this.tankImg = img;
     }
 
     @Override
@@ -74,7 +79,9 @@ public class Tank extends PlayerShip {
     @Override
     public void setWeapon(AbstractWeapon weapon) {
         this.weapon = (AbstractRotatableWeapon)weapon;
-        System.out.println("pwu");
+        if (this.weapon instanceof RotatablePlaneCanon) {
+            this.transformToPlane();
+        }
     }
 
     @Override
@@ -91,10 +98,18 @@ public class Tank extends PlayerShip {
         }
         // Rotational movement.
         if(this.right == 1){
-            this.angle -= 3 * Math.PI / 180;
+            if (this.isPlane) {
+                this.angle -= 1 * Math.PI / 180;
+            }
+            else
+                this.angle -= 3 * Math.PI / 180;
         }
         else if(this.left == 1){
-            this.angle += 3 * Math.PI / 180;
+            if (this.isPlane) {
+                this.angle += 1 * Math.PI / 180;
+            }
+            else
+                this.angle += 3 * Math.PI / 180;
         }
         // Translational movement.
         if (this.up == 1) {
@@ -102,8 +117,10 @@ public class Tank extends PlayerShip {
             location.x += Math.cos(this.angle) * speed.x;
         }
         else if (this.down == 1) {
-            location.y -= Math.sin(-this.angle) * speed.y;
-            location.x -= Math.cos(this.angle) * speed.x;
+            if (!this.isPlane) {
+                location.y -= Math.sin(-this.angle) * speed.y;
+                location.x -= Math.cos(this.angle) * speed.x;
+            }
         }
         if (this.collisionObj != null) {
             if(this.collision(collisionObj)) {
@@ -146,11 +163,26 @@ public class Tank extends PlayerShip {
     
     @Override
     public void collide(GameObject otherObject){
+        if (this.isPlane) {
+            return;
+        }
         this.collisionObj = otherObject;
+    }
+
+    private void transformToPlane() {
+        if (this.isPlane) {
+            return;
+        }
+        this.isPlane = true;
+        health = 1000;
+        setImage(GameWorld.getInstance().sprites.get("player3"));
     }
 
     @Override
     public void collide(Ship otherObject){
+        if (this.isPlane) {
+            return;
+        }
         this.collisionObj = otherObject;
         super.damage(1);
     }
@@ -181,6 +213,7 @@ public class Tank extends PlayerShip {
     @Override
     public void die(){
         this.wasDead = true;
+        this.isPlane = false;
         super.die();
     }
     
@@ -188,6 +221,7 @@ public class Tank extends PlayerShip {
     public void reset(){
         super.reset();
         this.weapon = new RotatableWeapon();
+        setImage(this.tankImg);
     }
     
     @Override
