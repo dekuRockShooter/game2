@@ -23,6 +23,7 @@ import wingman.modifiers.weapons.SpreadWeapon;
  */
 public class TankLevel extends Level {
     int lastPowerUp;
+    int lastSpawn;
     int endgameDelay = 100; // don't immediately end on game end
     
     /*Constructor sets up arrays of enemies in a LinkedHashMap*/
@@ -35,6 +36,7 @@ public class TankLevel extends Level {
      */
     public void load(){
         lastPowerUp = GameWorld.getInstance().getTime();
+        lastSpawn = GameWorld.getInstance().getTime();
     }
     
     public void read(Object theObject){
@@ -49,9 +51,22 @@ public class TankLevel extends Level {
     @Override
     public void update(Observable o, Object arg) {
         GameWorld world = GameWorld.getInstance();
-        if(world.getTime() - lastPowerUp > 3000){
+        if(world.getTime() - lastPowerUp > 7000){
+            Ship[] wave = {
+                    new SimpleEnemy(lastPowerUp % 700, new Point(-1, 5), 1, 16),
+                    new PowerupEnemy(lastPowerUp % 800, new Point(1, 4)),
+            };
+            world.addEnemies(wave);
             world.addRandomPowerUp();
             lastPowerUp=world.getTime();
+        }
+        if(world.getTime() - lastSpawn > 6000){
+            Ship[] wave = {
+                    new SimpleEnemy(lastSpawn % 800, new Point(1, 4), 1, 20),
+                    new PowerupEnemy(lastSpawn % 700, new Point(-1, 3)),
+            };
+            world.addEnemies(wave);
+            lastSpawn = world.getTime();
         }
         if(world.isGameOver()){
             if(endgameDelay<=0){
