@@ -22,11 +22,13 @@ public class GameMenu extends InterfaceObject {
     int selection;
     MenuController controller;
     boolean waiting;
+    int yellowTitle;
     
     public GameMenu(){
         selection = 0;
         controller = new MenuController(this);
         waiting = true;
+        this.yellowTitle = 0;
     }
     /**
      * Update the current selection.
@@ -34,17 +36,29 @@ public class GameMenu extends InterfaceObject {
     public void draw(Graphics g2, int x, int y){
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, x, y);
-        g2.setFont(new Font("Calibri", Font.PLAIN, 24));
-        if(selection==0)
+        if (yellowTitle < 2) {
+            g2.setColor(Color.YELLOW);
+            ++this.yellowTitle;
+        }
+        else if (this.yellowTitle < 4) {
+            g2.setColor(Color.ORANGE);
+            ++this.yellowTitle;
+        }
+        else if (this.yellowTitle < 6) {
             g2.setColor(Color.RED);
-        else
-            g2.setColor(Color.WHITE);
-        g2.drawString("1 Player", 200,150);
+            ++this.yellowTitle;
+        }
+        else {
+            this.yellowTitle = 0;
+        }
+        g2.setFont(new Font("Calibri", Font.BOLD, 48));
+        g2.drawString("TANK WARS!!!!", 200,150);
+        g2.setFont(new Font("Calibri", Font.PLAIN, 24));
         if(selection==1)
             g2.setColor(Color.RED);
         else
             g2.setColor(Color.WHITE);
-        g2.drawString("2 Player", 200, 250);
+        g2.drawString("Start", 200, 250);
         if(selection==2)
             g2.setColor(Color.RED);
         else
