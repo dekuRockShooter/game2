@@ -2,6 +2,7 @@ package wingman.game;
 
 import java.awt.Point;
 import java.awt.Image;
+import java.awt.Rectangle;
 
 import wingman.GameWorld;
 import wingman.modifiers.motions.MotionController;
@@ -10,6 +11,7 @@ import wingman.modifiers.motions.MotionController;
 public class Bullet extends MoveableObject {
     PlayerShip owner;
     boolean friendly;
+    boolean dead;
     
     public Bullet(Point location, Point speed, int strength, MotionController motion, GameObject owner){
         super(location, speed, GameWorld.sprites.get("enemybullet1"));
@@ -21,6 +23,7 @@ public class Bullet extends MoveableObject {
         }
         this.motion = motion;
         motion.addObserver(this);
+        this.dead = false;
     }
 
     public Bullet(Point location, Point speed, int strength,
@@ -39,4 +42,17 @@ public class Bullet extends MoveableObject {
         }
         return false;
     }
+
+    public void collide(GameObject otherObject) {
+        this.dead = true;
+    }
+
+    public void collide(BackgroundObject otherObject) {
+        this.dead = true;
+    }
+
+    public boolean isDead() {
+        return this.dead;
+    }
+
 }
