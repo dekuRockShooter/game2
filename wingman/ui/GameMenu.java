@@ -23,7 +23,7 @@ public class GameMenu extends InterfaceObject {
     MenuController controller;
     boolean waiting;
     int yellowTitle;
-    
+
     public GameMenu(){
         selection = 0;
         controller = new MenuController(this);
@@ -65,17 +65,17 @@ public class GameMenu extends InterfaceObject {
             g2.setColor(Color.WHITE);
         g2.drawString("Quit", 200, 350);
     }
-    
+
     public void down(){
         if(selection<2)
             selection++;
     }
-    
+
     public void up(){
         if(selection>0)
             selection--;
     }
-    
+
     /**
      * Start the game according to the selection.  The game that starts
      * depends on if single or two player mode was selected.
@@ -105,19 +105,19 @@ public class GameMenu extends InterfaceObject {
         else{
             System.exit(0);
         }
-        
+
         GameWorld.sound.play("Resources/strobe.mp3");
-        
+
         controller.deleteObservers();
         world.removeKeyListener(controller);
         waiting=false;
     }
-    
+
     public void update(Observable o, Object arg) {
         AbstractGameModifier modifier = (AbstractGameModifier) o;
         modifier.read(this);
     }
-    
+
     public boolean isWaiting(){
         return this.waiting;
     }
