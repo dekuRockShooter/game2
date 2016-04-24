@@ -11,6 +11,7 @@ import java.util.Observable;
 import wingman.GameWorld;
 import wingman.game.PlayerShip;
 import wingman.game.Tank;
+import wingman.game.Shell;
 import wingman.modifiers.AbstractGameModifier;
 import wingman.modifiers.motions.MenuController;
 
@@ -87,19 +88,10 @@ public class GameMenu extends InterfaceObject {
         GameWorld world = GameWorld.getInstance();
         Dimension size = world.getSize();
         // One player.
-        if(selection == 0){
+        if(selection == 1){
             int[] controls = {KeyEvent.VK_LEFT,KeyEvent.VK_UP, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN, KeyEvent.VK_SPACE};
-            PlayerShip player = new PlayerShip(new Point(240, size.height-50), new Point(6,6),GameWorld.sprites.get("player1"), controls, "Player 1");
+            PlayerShip player = new Shell(new Point(240, size.height-80), new Point(6,6),GameWorld.sprites.get("player1"), controls, "Player 1");
             world.addPlayer(player);
-        }
-        // Two players.
-        else if(selection == 1){
-            int[] controls = {KeyEvent.VK_A,KeyEvent.VK_W, KeyEvent.VK_D, KeyEvent.VK_S, KeyEvent.VK_SPACE};
-            PlayerShip[] players = new PlayerShip[2];
-            players[0] = new Tank(new Point(140, 50), new Point(6,6),GameWorld.sprites.get("player1"), controls, "Player 1");
-            controls = new int[] {KeyEvent.VK_LEFT,KeyEvent.VK_UP, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN, KeyEvent.VK_ENTER};
-            players[1] = new Tank(new Point(400, size.height-50), new Point(6,6),GameWorld.sprites.get("player2"), controls, "Player 2");
-            world.addPlayer(players);
         }
         // Quit.
         else{

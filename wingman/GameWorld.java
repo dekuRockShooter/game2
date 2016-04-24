@@ -324,8 +324,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         }
         ui.add(new ScoreBar(playersInPlay.get(0),
                new Point(0,0)));
-        ui.add(new ScoreBar(playersInPlay.get(1),
-               new Point((this.sizeX / 2) + 20, 20)));
     }
 
     /**
@@ -405,24 +403,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 this.level = this.levels.pop();
                 this.drawMap();
                 this.level.load();
-                System.out.println("new map");
-            }
-            // Draw some explosions.
-            if ((this.getTime() % 100) == 0) {
-                int x = generator.nextInt(100);
-                int y = generator.nextInt(100);
-                if ((x % 2) == 0) {
-                    x = -x;
-                }
-                if ((y % 2) == 0) {
-                    y = -y;
-                }
-                this.addBackground(new SmallExplosion(new Point(
-                                this.playersInPlay.get(0).getX() + x,
-                                this.playersInPlay.get(0).getY() + y)));
-                this.addBackground(new SmallExplosion(new Point(
-                                this.playersInPlay.get(1).getX() - y,
-                                this.playersInPlay.get(1).getY() - x)));
             }
 
             while(iterator.hasNext()){
@@ -437,7 +417,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 breakable.draw(g2, this);
             }
             PlayerShip player1 = this.playersInPlay.get(0);
-            PlayerShip player2 = this.playersInPlay.get(1);
             for (PlayerShip curPlayer : this.playersInPlay) {
                 for (BackgroundObject bg : this.collidableBackgrounds) {
                     if(curPlayer.collision(bg)){
@@ -450,11 +429,6 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                     }
                 }
             }
-            if (player1.collision(player2)) {
-                player1.collide(player2);
-                player2.collide(player1);
-            }
-
             // remove stray enemy bullets and draw
             Iterator<Bullet> bulletIter = getEnemyBullets();
             while(bulletIter.hasNext()){
@@ -645,10 +619,11 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             return;
         }
         this.paintWindow(0);
-        g.drawImage(bimg.getSubimage(this.leftWindowCoords[0],
-                                     this.leftWindowCoords[1],
-                                     windowSize.width, windowSize.height),
-                                     0, 0, this);
+        //g.drawImage(bimg.getSubimage(this.leftWindowCoords[0],
+                                     //this.leftWindowCoords[1],
+                                     //windowSize.width, windowSize.height),
+                                     //0, 0, this);
+        g.drawImage(bimg, 0, 0, this);
         g2.dispose();
     }
 
