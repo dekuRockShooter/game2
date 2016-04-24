@@ -110,7 +110,6 @@ public class GameMenu extends InterfaceObject {
         
         controller.deleteObservers();
         world.removeKeyListener(controller);
-        world.level.load();
         waiting=false;
     }
     
