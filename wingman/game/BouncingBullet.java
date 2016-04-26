@@ -9,10 +9,7 @@ import wingman.modifiers.motions.MotionController;
 
 /*Bullets fired by player and enemy weapons*/
 public class BouncingBullet extends Bullet {
-    PlayerShip owner;
     boolean friendly;
-    boolean leftHit;
-    boolean bottomHit;
     Point origin;
     
     public BouncingBullet(Point location, Point speed, int strength, MotionController motion, GameObject owner){
@@ -21,7 +18,7 @@ public class BouncingBullet extends Bullet {
         if(owner instanceof PlayerShip){
             this.owner = (PlayerShip) owner;
             this.friendly=true;
-            this.setImage(GameWorld.sprites.get("explosion1_3"));
+            this.setImage(GameWorld.sprites.get("bullet"));
         }
         this.motion = motion;
         motion.addObserver(this);
@@ -31,22 +28,8 @@ public class BouncingBullet extends Bullet {
     public BouncingBullet(Point location, Point speed, int strength,
                   MotionController motion, GameObject owner, Image img){
         this(location, speed, strength, motion, owner);
-        //this.setImage(img);
-        this.leftHit = false;
-        this.bottomHit = false;
     }
     
-    public PlayerShip getOwner(){
-        return owner;
-    }
-    
-    public boolean isFriendly(){
-        if(friendly){
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public void update(int w, int h) {
         location.x += speed.x;
@@ -65,7 +48,49 @@ public class BouncingBullet extends Bullet {
     }
 
     @Override
-    public void collide(BackgroundObject otherObject) {
+    public void collide(GameObject otherObject) {
+        this.impact(otherObject);
+    }
+
+    @Override
+    public void collide(PlayerShip otherObject) {
+        Rectangle wall = otherObject.getLocation();
+        Rectangle intersection = wall.intersection(location);
+        if (speed.x == 0) {
+            speed.y = -speed.y;
+            return;
+        }
+        if (speed.y == 0) {
+            speed.x = -speed.x;
+            return;
+        }
+        double x = intersection.x - wall.x;
+        speed.y = -speed.y;
+        if (x < (wall.width / 6)) {
+            speed.x = -(int)(5 * Math.cos(Math.PI / 6));
+        }
+        else if (x < (wall.width / 4)) {
+            speed.x = -(int)(5 * Math.cos(Math.PI / 4));
+        }
+        else if (x < (wall.width / 2)) {
+            speed.x = -(int)(5 * Math.cos(Math.PI / 3));
+        }
+        else if (x < (4*wall.width / 6)) {
+            speed.x = (int)(5 * Math.cos(Math.PI / 3));
+        }
+        else if (x < (3*wall.width / 4)) {
+            speed.x = (int)(5 * Math.cos(Math.PI / 4));
+        }
+        else {
+            speed.x = (int)(5 * Math.cos(Math.PI / 6));
+        }
+        while (location.intersects(wall)) {
+            location.x += speed.x;
+            location.y += speed.y;
+        }
+    }
+
+    private void impact(GameObject otherObject) {
         Rectangle wall = otherObject.getLocation();
         Rectangle intersection = wall.intersection(location);
         if (speed.x == 0) {
