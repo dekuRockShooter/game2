@@ -51,6 +51,14 @@ public class Bullet extends MoveableObject {
         this.dead = true;
     }
 
+    public void collide(BreakableWall otherObject) {
+        this.dead = true;
+    }
+
+    public void collide(PlayerShip otherObject) {
+        this.dead = true;
+    }
+
     public boolean isDead() {
         return this.dead;
     }
