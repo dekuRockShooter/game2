@@ -46,6 +46,16 @@ public class BouncingBullet extends Bullet {
         }
         return false;
     }
+    
+    @Override
+    public void collide(BackgroundObject otherObject) {
+        this.impact(otherObject);
+    }
+
+    @Override
+    public void collide(BreakableWall otherObject) {
+        this.impact(otherObject);
+    }
 
     @Override
     public void collide(GameObject otherObject) {
