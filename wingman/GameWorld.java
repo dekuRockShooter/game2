@@ -403,6 +403,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 this.level = this.levels.pop();
                 this.drawMap();
                 this.level.load();
+                new RotatableBouncer().fireWeapon(this.playersInPlay.get(0));
             }
 
             while(iterator.hasNext()){
@@ -436,8 +437,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 ListIterator<PlayerShip> players = getPlayers();
                 while(players.hasNext()){
                     PlayerShip player = players.next();
-                    if(bullet.collision(player) && player.respawnCounter<=0 &&
-                       bullet.getOwner() != player){
+                    if(bullet.collision(player)) {
                         player.collide(bullet);
                         bullet.collide(player);
                         if (bullet.isDead())
