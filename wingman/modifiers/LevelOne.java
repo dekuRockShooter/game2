@@ -14,6 +14,7 @@ import wingman.game.enemy.HoverEnemy;
 import wingman.game.enemy.PowerupEnemy;
 import wingman.game.enemy.PulseEnemy;
 import wingman.game.enemy.SimpleEnemy;
+import wingman.game.enemy.BigLeg;
 import wingman.modifiers.weapons.SpreadWeapon;
 
 /*This is where enemies are introduced into the game according to a timeline*/
@@ -39,11 +40,6 @@ public class LevelOne extends Level {
         GameWorld world = GameWorld.getInstance();
         lastPowerUp = GameWorld.getInstance().getTime();
         lastSpawn = GameWorld.getInstance().getTime();
-        Ship[] wave = {
-                new HoverEnemy(200, new Point(1, 1)),
-                new HoverEnemy(200, new Point(1, 1))
-        };
-        world.addEnemies(wave);
         lastPowerUp=world.getTime();
     }
     
