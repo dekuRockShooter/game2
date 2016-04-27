@@ -24,6 +24,7 @@ import javax.swing.*;
 import wingman.game.*;
 import wingman.game.enemy.BigLeg;
 import wingman.modifiers.*;
+import wingman.modifiers.motions.SimpleMotion;
 import wingman.modifiers.weapons.*;
 import wingman.ui.*;
 
@@ -413,7 +414,14 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 this.level = this.levels.pop();
                 this.drawMap();
                 this.level.load();
-                new RotatableBouncer().fireWeapon(this.playersInPlay.get(0));
+                Point location = this.playersInPlay.get(0).getLocationPoint();
+                location.y -= 40;
+                Point speed = new Point(1, -4);
+
+                Bullet bullet = new BouncingBullet(location, speed, 10, 
+                        new SimpleMotion(), this.playersInPlay.get(0),
+                        GameWorld.sprites.get("bullet"));
+                this.enemyBullets.add(bullet);
             }
 
             while(iterator.hasNext()){
