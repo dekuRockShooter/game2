@@ -30,8 +30,8 @@ abstract public class GameObject implements Observer {
         this.speed = speed;
         this.img=img;
         this.show=true;
-        height = img.getWidth(observer);
-        width = img.getHeight(observer);
+        width = img.getWidth(observer);
+        height = img.getHeight(observer);
         this.location = new Rectangle(location.x,location.y,width,height);
     }
     
@@ -46,8 +46,8 @@ abstract public class GameObject implements Observer {
     
     public void setImage(Image img){
         this.img = img;
-        this.height = img.getWidth(observer);
-        this.width = img.getHeight(observer);
+        this.width = img.getWidth(observer);
+        this.height = img.getHeight(observer);
         this.location.width = width;
         this.location.height = height;
     }
