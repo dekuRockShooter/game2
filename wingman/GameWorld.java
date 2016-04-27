@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import javax.swing.*;
 
 import wingman.game.*;
+import wingman.game.enemy.BigLeg;
 import wingman.modifiers.*;
 import wingman.modifiers.weapons.*;
 import wingman.ui.*;
@@ -171,7 +172,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                         //collidableBackgrounds.add(island);
                     }
                     else if (curTile == '3') {
-                        img = this.sprites.get("planePWUP");
+                        img = this.sprites.get("lifePWUP");
                         imgHeight = img.getHeight(this);
                         imgWidth = img.getWidth(this);
                         BreakableWall island =
@@ -179,12 +180,19 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                         this.breakableWalls.add(island);
                     }
                     else if (curTile == '4') {
-                        img = this.sprites.get("machinegunPWUP");
+                        img = this.sprites.get("popPWUP");
                         imgHeight = img.getHeight(this);
                         imgWidth = img.getWidth(this);
                         BreakableWall island =
                             new BreakableWall(point, 10, img);
                         this.breakableWalls.add(island);
+                    }
+                    else if (curTile == '5') {
+                        img = this.sprites.get("bigleg");
+                        imgHeight = img.getHeight(this);
+                        BigLeg bigleg =  new BigLeg(point, new Point(2, 1));
+                        this.addEnemies(bigleg);
+                        //xCoord = xCoord + img.getWidth(this);
                     }
                     xCoord = xCoord + imgWidth;
                     ++charIdx;
@@ -200,22 +208,24 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
 
     /*Functions for loading image resources*/
     private void loadSprites(){
-        sprites.put("wall1", getSprite("Chapter11/Blue_wall1.png"));
-        sprites.put("wall2", getSprite("Chapter11/Blue_wall2.png"));
+        sprites.put("wall1", getSprite("reef_resources/Block7.gif"));
+        sprites.put("wall2", getSprite("reef_resources/Block5.gif"));
         sprites.put("floor", getSprite("Chapter11/Background.png"));
 
-        sprites.put("bullet", getSprite("Resources/enemybullet1.png"));
+        sprites.put("bullet", getSprite("reef_resources/Pop.gif"));
         sprites.put("enemybullet1", getSprite("Resources/enemybullet1.png"));
         sprites.put("canon", getSprite("Chapter11/canonBullet.png"));
 
-        sprites.put("player1", getSprite("Chapter11/Tank1.png"));
+        sprites.put("player1", getSprite("reef_resources/Katch.gif"));
         sprites.put("player2", getSprite("Chapter11/Tank2.png"));
         sprites.put("player3", getSprite("Resources/player3.png"));
         sprites.put("enemy1", getSprite("Resources/enemy1.png"));
         sprites.put("enemy2", getSprite("Resources/enemy2.png"));
         sprites.put("enemy3", getSprite("Resources/enemy3.png"));
-        sprites.put("bouncerPWUP", getSprite("Chapter11/BouncerPowerup.png"));
-        sprites.put("machinegunPWUP", getSprite("Chapter11/MachineGunPowerup.png"));
+        sprites.put("bigleg", getSprite("reef_resources/Bigleg.gif"));
+        sprites.put("smallleg", getSprite("reef_resources/Bigleg_small.gif"));
+        sprites.put("lifePWUP", getSprite("reef_resources/Block_life.gif"));
+        sprites.put("popPWUP", getSprite("reef_resources/Block_split.gif"));
         sprites.put("canonPWUP", getSprite("Chapter11/CanonPowerup.png"));
         sprites.put("minePWUP", getSprite("Chapter11/MinePowerup.png"));
         sprites.put("planePWUP", getSprite("Resources/life2.png"));
@@ -481,6 +491,19 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                     bulletIter.remove();
                 }
                 bullet.draw(g2, this);
+            }
+
+            for (Ship enemy : this.enemies) {
+                for (BackgroundObject bg : this.collidableBackgrounds) {
+                    if(enemy.collision(bg)){
+                        enemy.collide(bg);
+                    }
+                }
+                for (BreakableWall breakable : this.breakableWalls) {
+                    if(enemy.collision((GameObject)breakable)){
+                        enemy.collide((GameObject)breakable);
+                    }
+                }
             }
 
             // remove stray friendly bullets and draw

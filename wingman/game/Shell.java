@@ -16,6 +16,7 @@ public class Shell extends PlayerShip implements Observer {
     public Shell(Point location, Point speed, Image img, int[] controls, String name) {
         super(location,speed,img, controls, name);
         weapon = new NullWeapon();
+        setImage(img);
     }
 
     @Override
