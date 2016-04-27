@@ -191,9 +191,14 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                     else if (curTile == '5') {
                         img = this.sprites.get("bigleg");
                         imgHeight = img.getHeight(this);
-                        BigLeg bigleg =  new BigLeg(point, new Point(2, 1));
+                        BigLeg bigleg =  new BigLeg(point, new Point(2, 1),img);
                         this.addEnemies(bigleg);
-                        //xCoord = xCoord + img.getWidth(this);
+                    }
+                    else if (curTile == '6') {
+                        img = this.sprites.get("smallleg");
+                        imgHeight = img.getHeight(this);
+                        BigLeg bigleg =  new BigLeg(point, new Point(2, 1),img);
+                        this.addEnemies(bigleg);
                     }
                     xCoord = xCoord + imgWidth;
                     ++charIdx;
