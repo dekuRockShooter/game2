@@ -31,12 +31,11 @@ public class RotatableBouncer extends AbstractRotatableWeapon {
         super.fireWeapon(theShip);
         Point location = theShip.getLocationPoint();
         Point offset = theShip.getGunLocation();
-        location.x+=offset.x;
-        location.y+=offset.y;
-        Point speed = new Point((int)(8*Math.cos(angle)),
-                                (int)(-8*Math.sin(angle)));
+        location.x = 50;
+        location.y = 500;
+        Point speed = new Point(1, -4);
 
-        Bullet bullet = new BouncingBullet(location, speed, strength, new SimpleMotion(), theShip, GameWorld.sprites.get("canon"));
+        Bullet bullet = new BouncingBullet(location, speed, strength, new SimpleMotion(), theShip, GameWorld.sprites.get("bullet"));
         bullets = new Bullet[1];
         bullets[0] = bullet;
 
