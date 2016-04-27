@@ -185,7 +185,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                         imgHeight = img.getHeight(this);
                         imgWidth = img.getWidth(this);
                         BreakableWall island =
-                            new BreakableWall(point, 10, img);
+                            new BreakableWallWithPop(point, 10, img);
                         this.breakableWalls.add(island);
                     }
                     else if (curTile == '5') {
@@ -491,6 +491,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 while (breakableIter.hasNext()) {
                     breakable = breakableIter.next();
                     if(bullet.collision(breakable)){
+                        breakable.collide(bullet);
                         bullet.collide(breakable);
                         if (bullet.isDead())
                             bulletIter.remove();
