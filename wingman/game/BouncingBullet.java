@@ -11,6 +11,7 @@ import wingman.modifiers.motions.MotionController;
 public class BouncingBullet extends Bullet {
     boolean friendly;
     Point origin;
+    int lastUpdate;
     
     public BouncingBullet(Point location, Point speed, int strength, MotionController motion, GameObject owner){
         super(location, speed, strength, motion, owner);
@@ -23,6 +24,7 @@ public class BouncingBullet extends Bullet {
         this.motion = motion;
         motion.addObserver(this);
         this.origin = location;
+        this.lastUpdate = GameWorld.getInstance().getTime();
     }
 
     public BouncingBullet(Point location, Point speed, int strength,
@@ -32,8 +34,13 @@ public class BouncingBullet extends Bullet {
     
     @Override
     public void update(int w, int h) {
-        location.x += speed.x;
-        location.y += speed.y;
+        if (GameWorld.getInstance().getTime() - this.lastUpdate < 400) {
+            location.x += speed.x;
+            location.y += speed.y;
+            return;
+        }
+        this.lastUpdate = GameWorld.getInstance().getTime();
+        speed.y = (1) + (speed.y);
         if(location.y<-100 || location.y==h+100){
             this.show=false;
         }
@@ -105,6 +112,7 @@ public class BouncingBullet extends Bullet {
         Rectangle intersection = wall.intersection(location);
         if (speed.x == 0) {
             speed.y = -speed.y;
+            //if (speed.y < 0)
             return;
         }
         if (speed.y == 0) {
