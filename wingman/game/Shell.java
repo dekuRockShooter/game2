@@ -16,7 +16,7 @@ public class Shell extends PlayerShip implements Observer {
     public Shell(Point location, Point speed, Image img, int[] controls, String name) {
         super(location,speed,img, controls, name);
         weapon = new NullWeapon();
-        setImage(img);
+        lives = 3;
     }
 
     @Override
@@ -27,8 +27,18 @@ public class Shell extends PlayerShip implements Observer {
     }
 
     @Override
+    public void die() {
+        lives = lives - 1;
+    }
+
+    @Override
     public void reset(){
         super.reset();
         this.weapon = new NullWeapon();
+    }
+
+    @Override
+    public boolean isDead(){
+        return lives < 1;
     }
 }
