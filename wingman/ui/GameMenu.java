@@ -90,7 +90,7 @@ public class GameMenu extends InterfaceObject {
         // One player.
         if(selection == 1){
             int[] controls = {KeyEvent.VK_LEFT,KeyEvent.VK_UP, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN, KeyEvent.VK_SPACE};
-            PlayerShip player = new Shell(new Point(240, size.height-80), new Point(6,6),GameWorld.sprites.get("player1"), controls, "Player 1");
+            PlayerShip player = new Shell(new Point(240, size.height-80), new Point(12,6),GameWorld.sprites.get("player1"), controls, "Player 1");
             world.addPlayer(player);
         }
         // Quit.
