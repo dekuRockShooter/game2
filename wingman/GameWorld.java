@@ -177,7 +177,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                         imgHeight = img.getHeight(this);
                         imgWidth = img.getWidth(this);
                         BreakableWall island =
-                            new BreakableWall(point, 10, img);
+                            new BreakableWallWithLife(point, 10, img);
                         this.breakableWalls.add(island);
                     }
                     else if (curTile == '4') {
@@ -335,11 +335,8 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         for(PlayerShip player : newObjects){
             players.add(player);
             playersInPlay.add(player);
-            ui.add(new HealthBar(player, Integer.toString(players.size())));
-            shake.put(player.getName(), null);
         }
-        ui.add(new ScoreBar(playersInPlay.get(0),
-               new Point(0,0)));
+        ui.add(new InfoBar(playersInPlay.get(0), "player1"));
     }
 
     /**
@@ -403,6 +400,17 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
         clock.addObserver(theObject);
     }
 
+    private void addPop() {
+            Point location = this.playersInPlay.get(0).getLocationPoint();
+            location.y -= 40;
+            Point speed = new Point(1, -4);
+
+            Bullet bullet = new BouncingBullet(location, speed, 10, 
+                    new SimpleMotion(), this.playersInPlay.get(0),
+                    sprites.get("bullet"));
+            this.enemyBullets.add(bullet);
+    }
+
     // this is the main function where game stuff happens!
     // each frame is also drawn here
     public void drawFrame(int w, int h, Graphics2D g2) {
@@ -419,14 +427,7 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 this.level = this.levels.pop();
                 this.drawMap();
                 this.level.load();
-                Point location = this.playersInPlay.get(0).getLocationPoint();
-                location.y -= 40;
-                Point speed = new Point(1, -4);
-
-                Bullet bullet = new BouncingBullet(location, speed, 10, 
-                        new SimpleMotion(), this.playersInPlay.get(0),
-                        GameWorld.sprites.get("bullet"));
-                this.enemyBullets.add(bullet);
+                this.addPop();
             }
 
             while(iterator.hasNext()){
@@ -503,7 +504,15 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
                 }
                 if(bullet.getY()>h+10 || bullet.getY()<-10){
                     bulletIter.remove();
+                    this.playersInPlay.get(0).die();
+                    if (this.playersInPlay.get(0).isDead()) {
+                        // TODO: game over
+                    }
+                    else if (this.enemyBullets.size() == 0) {
+                        this.addPop();
+                    }
                 }
+                bullet.update(w, h);
                 bullet.draw(g2, this);
             }
 
@@ -521,8 +530,10 @@ public final class GameWorld extends JPanel implements Runnable, Observer {
             }
 
             // remove stray friendly bullets and draw
+            // TODO: remove this block.
             iterator = getFriendlyBullets();
             while(iterator.hasNext()){
+                System.out.println("111111111111111111111");
                 Bullet obj = (Bullet) iterator.next();
                 //obj.update(w, h);
                 if(obj.getY()>h+10 || obj.getY()<-10){
