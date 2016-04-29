@@ -27,5 +27,6 @@ public class BreakableWallWithPop extends BreakableWall {
                 new SimpleMotion(), GameWorld.getInstance().getPlayers().next(),
                 GameWorld.sprites.get("bullet"));
         GameWorld.getInstance().addBullet(bullet);
+        GameWorld.getInstance().getPlayers().next().incrementLife();
     }
 }
